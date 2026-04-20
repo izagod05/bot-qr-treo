@@ -1,17 +1,4 @@
 require('dotenv').config();
-
-const express = require("express");
-const app = express();
-
-app.get("/", (req, res) => {
-  res.send("Bot is running");
-});
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("Web server running on " + PORT);
-});
 const { Client } = require('discord.js-selfbot-v13');
 const { MessageAttachment } = require('discord.js');
 const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, StreamType, AudioPlayerStatus, VoiceConnectionStatus, entersState } = require('@discordjs/voice');
@@ -580,4 +567,26 @@ function parseAmount(str) {
     return value;
 }
 
-client.login(process.env.TOKEN);
+// == EXPRESS WEB SERVER CHO FLY.IO ==
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+    res.send('Bot is running');
+});
+
+app.listen(port, () => {
+    console.log(`🌐 Web server đang chạy trên port ${port} để duy trì process không bị tắt...`);
+});
+
+// START BOT
+const botToken = process.env.DISCORD_TOKEN || process.env.TOKEN;
+if (botToken) {
+    client.login(botToken).catch(err => {
+        console.error('❌ Lỗi đăng nhập Discord (Token không hợp lệ hoặc hết hạn):', err.message);
+        // Không gọi process.exit(1) để giữ server web express vẫn sống
+    });
+} else {
+    console.error('❌ Thiếu biến môi trường DISCORD_TOKEN để đăng nhập bot!');
+}
